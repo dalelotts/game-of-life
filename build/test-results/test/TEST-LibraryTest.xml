@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="LibraryTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2018-08-19T11:41:47" hostname="Duckys-MacBook-Pro-2017.local" time="0.001">
-  <properties/>
-  <testcase name="testSomeLibraryMethod" classname="LibraryTest" time="0.001"/>
-  <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[]]></system-err>
-</testsuite>

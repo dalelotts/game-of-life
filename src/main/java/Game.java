@@ -1,11 +1,11 @@
-import io.reactivex.Observable;
+import com.google.common.collect.Streams;
 
 import java.awt.Point;
 import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
-import java.util.TreeSet;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -22,47 +22,57 @@ final class Game {
 			new Point(1, 1)
 	};
 
-	private final Set<Point> liveCells = new TreeSet<>(Comparator.comparingInt((Point point) -> point.x).thenComparingInt(point -> point.y));
+	private final Set<Point> liveCells = new HashSet<>();
 
 	Game(final Point... initialState) {
 		liveCells.addAll(Arrays.asList(initialState));
 	}
 
 	private int countLiveNeighbors(final Point point) {
-		return (int) getNeighbors(point).filter(liveCells::contains).count();
+		return (int) neighbors(point).filter(liveCells::contains).count();
 	}
 
-	private Stream<Point> deadNeighbors(final Point point) {
-		return getNeighbors(point).filter(neighbor -> !liveCells.contains(neighbor));
+	Set<Point> getLiveCells() {
+		return Collections.unmodifiableSet(liveCells);
 	}
 
-	private static Stream<Point> getNeighbors(final Point point) {
+	private Boolean hasThreeLiveNeighbors(final Point point) {
+		return countLiveNeighbors(point) == 3;
+	}
+
+	private Boolean hasTwoOrThreeLiveNeighbors(final Point point) {
+		final int liveNeighbors = countLiveNeighbors(point);
+		return liveNeighbors == 2 || liveNeighbors == 3;
+	}
+
+	private static Stream<Point> neighbors(final Point point) {
 		return Arrays
 				.stream(NEIGHBORS)
-				.map(neighborAdjustment -> new Point(point.x + neighborAdjustment.x, point.y + neighborAdjustment.y));
+				.map(neighbor -> new Point(point.x + neighbor.x, point.y + neighbor.y));
 	}
 
-	Observable<Point> tick() {
-		final List<Point> newLiveCells = liveCells
-				.stream()
-				.filter(point -> {
-					final int liveNeighbors = countLiveNeighbors(point);
-					return liveNeighbors > 1 && liveNeighbors < 3;
-				})
-				.collect(Collectors.toList());
+	// This will not be necessary as Predicate#not is being added in Java 11.
+	private static <R> Predicate<R> not(final Predicate<R> predicate) {
+		return predicate.negate();
+	}
 
-		final Set<Point> newCells = liveCells
-				.stream()
-				.flatMap(this::deadNeighbors)
-				.distinct()
-				.filter(point -> countLiveNeighbors(point) == 3)
-				.collect(Collectors.toSet());
-
+	void tick() {
+		final Set<Point> nextState = Streams.concat(
+				liveCells
+						.stream()
+						.filter(this::hasTwoOrThreeLiveNeighbors),
+				liveCells
+						.stream()
+						.flatMap(this::toDeadNeighbors)
+						.distinct()
+						.filter(this::hasThreeLiveNeighbors)
+		).collect(Collectors.toSet());
 
 		liveCells.clear();
-		liveCells.addAll(newLiveCells);
-		liveCells.addAll(newCells);
+		liveCells.addAll(nextState);
+	}
 
-		return Observable.fromIterable(liveCells);
+	private Stream<Point> toDeadNeighbors(final Point point) {
+		return neighbors(point).filter(not(liveCells::contains));
 	}
 }

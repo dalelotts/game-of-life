@@ -24,5 +24,5 @@ array indexes (having a hard lower bounds of [0, 0] is not infinite)
 
 This implementation has no `if` statements, which is somewhat interesting.
 
-There is something far more interesting, at least to me, that I realized for the first time during this implementation,
+There is something far more interesting, at least to me, that I realized for the first time during this implementation.
 Can you guess what it is?

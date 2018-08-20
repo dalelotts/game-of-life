@@ -3,6 +3,7 @@
 *.ctxt
 *.ear
 *.jar
+*.iml
 *.log
 *.nar
 *.rar

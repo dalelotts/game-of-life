@@ -30,3 +30,10 @@ array indexes (having a hard lower bounds of [0, 0] is not infinite)
 - No variable reassignments
 - No naked primitives
 - Short functions only
+
+## Common Mistakes
+
+These are some of the mistakes I see in other implementations:
+
+- The universe of the game is infinite so you will likely run out of memory tracking both live and dead cells.
+- The universe cannot be represented in a two-dimensional array because Java (and JavaScript) do not support negative array indexes (having a hard lower bounds of [0, 0] is not infinite)

@@ -22,7 +22,11 @@ array indexes (having a hard lower bounds of [0, 0] is not infinite)
     
 ## Implementation
 
-This implementation has no `if` statements, which is somewhat interesting.
-
-There is something far more interesting, at least to me, that I realized for the first time during this implementation.
-Can you guess what it is?
+- Test-Driven Development
+- 100% code coverage (The TDD default - Application class is excluded)
+- Infinite grid (at least to the extent it is addressable by the Point class)
+- No `if` statements
+- Immutable objects (state within the Game is mutated internally)
+- No variable reassignments
+- No naked primitives
+- Short functions only

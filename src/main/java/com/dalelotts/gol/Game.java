@@ -1,17 +1,19 @@
-import com.google.common.collect.Streams;
+package com.dalelotts.gol;
 
 import java.awt.Point;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-final class Game {
+import static java.util.function.Predicate.not;
+import static java.util.stream.Collectors.toSet;
+import static java.util.stream.Stream.concat;
 
-	private static final Point[] NEIGHBORS = {
+
+final class Game {
+	private static final Set<Point> NEIGHBORS = Set.of(
 			new Point(-1, -1),
 			new Point(-1, 0),
 			new Point(-1, 1),
@@ -20,7 +22,7 @@ final class Game {
 			new Point(1, -1),
 			new Point(1, 0),
 			new Point(1, 1)
-	};
+	);
 
 	private final Set<Point> liveCells = new HashSet<>();
 
@@ -46,27 +48,26 @@ final class Game {
 	}
 
 	private static Stream<Point> neighbors(final Point point) {
-		return Arrays
-				.stream(NEIGHBORS)
+		return NEIGHBORS.stream()
 				.map(neighbor -> new Point(point.x + neighbor.x, point.y + neighbor.y));
 	}
 
-	// This will not be necessary as Predicate#not is being added in Java 11.
-	private static <R> Predicate<R> not(final Predicate<R> predicate) {
-		return predicate.negate();
+	private Stream<Point> newCells() {
+		return liveCells
+				.stream()
+				.flatMap(this::toDeadNeighbors)
+				.distinct()
+				.filter(this::hasThreeLiveNeighbors);
+	}
+
+	private Stream<Point> survivors() {
+		return liveCells
+				.stream()
+				.filter(this::hasTwoOrThreeLiveNeighbors);
 	}
 
 	void tick() {
-		final Set<Point> nextState = Streams.concat(
-				liveCells
-						.stream()
-						.filter(this::hasTwoOrThreeLiveNeighbors),
-				liveCells
-						.stream()
-						.flatMap(this::toDeadNeighbors)
-						.distinct()
-						.filter(this::hasThreeLiveNeighbors)
-		).collect(Collectors.toSet());
+		final Set<Point> nextState = concat(survivors(), newCells()).collect(toSet());
 
 		liveCells.clear();
 		liveCells.addAll(nextState);

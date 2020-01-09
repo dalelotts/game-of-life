@@ -1,7 +1,8 @@
-/* See the file "LICENSE" for the full license governing this code. */
+package com.dalelotts.gol;/* See the file "LICENSE" for the full license governing this code. */
 
 import de.vandermeer.asciitable.AsciiTable;
 import de.vandermeer.skb.interfaces.transformers.textformat.TextAlignment;
+import lombok.Generated;
 
 import java.awt.Point;
 import java.util.ArrayList;
@@ -14,8 +15,10 @@ import java.util.Set;
  * @since 8/20/18.
  */
 
+@Generated
 final class Application {
 
+	@Generated
 	public static void main(final String... args) {
 		try (final Scanner scanner = new Scanner(System.in)) {
 			System.out.println("Please press any key then enter to see the next game state:");
